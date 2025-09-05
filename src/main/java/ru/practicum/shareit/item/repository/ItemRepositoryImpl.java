@@ -30,14 +30,14 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Collection<Item> findByOwnerId(Long ownerId) {
         log.info("Ищу вещи владельца : {}", ownerId);
         return items.stream()
-                .filter(item -> item.getOwnerId() == ownerId)
+                .filter(item -> item.getOwnerId().equals(ownerId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteByUserIdAndItemId(Long userId, Long itemId) {
         log.info("Удаляю вещь : {}, {}", itemId, userId);
-        items.removeIf(item -> item.getOwnerId() == userId && item.getId() == itemId);
+        items.removeIf(item -> item.getOwnerId().equals(userId) && item.getId().equals(itemId));
     }
 
     @Override
