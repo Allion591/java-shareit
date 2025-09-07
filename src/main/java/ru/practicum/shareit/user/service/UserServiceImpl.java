@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto update(UserDto userDto, Long userId) {
         log.info("Сервис пользователей принял запрос на обновление пользователя с Ид: {}", userId);
-        if (repository.existsByEmail(userDto.getEmail())) {
+        if (repository.existsByEmailAndIdNot(userDto.getEmail(), userId)) {
             throw new EmailAlreadyExistsException("Пользователь с email " + userDto.getEmail() + " уже существует");
         }
         userDto.setId(userId);
