@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.Collection;
@@ -22,9 +22,9 @@ public class BookingController {
     @ResponseStatus(HttpStatus.CREATED)
     public BookingResponseDto create(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestBody @Valid Booking booking) {
+            @RequestBody @Valid BookingDto bookingDto) {
         log.info("Получен запрос на бронирование от пользователя ID: {}", userId);
-        return bookingService.create(booking, userId);
+        return bookingService.create(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
