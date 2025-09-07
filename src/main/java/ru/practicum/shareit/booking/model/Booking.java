@@ -13,5 +13,5 @@ public class Booking {
     private LocalDateTime end;
     private Item item;
     private UserResponseDto booker;
-    private BookingStatus status;
+    private BookingStatus status = BookingStatus.WAITING;
 }
