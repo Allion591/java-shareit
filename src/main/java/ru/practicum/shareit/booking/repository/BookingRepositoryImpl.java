@@ -35,7 +35,7 @@ public class BookingRepositoryImpl implements BookingRepository {
         return bookings.stream()
                 .filter(booking -> booking.getId().equals(bookingId))
                 .findFirst()
-                .orElseThrow(()-> new NotFoundException("Бронь не найдена")) ;
+                .orElseThrow(() -> new NotFoundException("Бронь не найдена"));
     }
 
     @Override
