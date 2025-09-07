@@ -2,11 +2,14 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exceptions.NotOwnerException;
+import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collection;
@@ -20,16 +23,27 @@ public class BookingServiceImpl implements BookingService {
     private final UserService userService;
 
     @Override
-    public BookingResponseDto create(Booking booking, Long userId) {
-        booking.setBooker(userService.getById(userId));
-        return bookingMapper.toResponseDto(bookingRepository.save(booking));
+    public BookingResponseDto create(BookingDto bookingDto, Long userId) {
+        bookingDto.setBooker(userService.getById(userId));
+        return bookingMapper.toResponseDto(bookingRepository.save(bookingMapper.toBooking(bookingDto)));
     }
 
     @Override
     public BookingResponseDto update(Long bookingId, Long userId, Boolean approved) {
         Booking booking = bookingRepository.getById(bookingId);
+
+        if (!booking.getItem().getOwnerId().equals(userId)) {
+            throw new NotOwnerException("Только владелец вещи может подтверждать бронирование");
+        }
         booking.setBooker(userService.getById(userId));
-        booking.setStatus(BookingStatus.valueOf(approved.toString()));
+        if (booking.getStatus() != BookingStatus.WAITING) {
+            throw new ValidationException("Статус бронирования уже был изменен");
+        }
+        if (approved) {
+            booking.setStatus(BookingStatus.APPROVED);
+        } else {
+            booking.setStatus(BookingStatus.REJECTED);
+        }
         return bookingMapper.toResponseDto(bookingRepository.update(booking));
     }
 
