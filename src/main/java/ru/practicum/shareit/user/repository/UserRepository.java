@@ -10,7 +10,7 @@ public interface UserRepository {
 
     User save(User user);
 
-    User update(UserDto userDto);
+    User update(User userDto);
 
     public void deleteById(Long userId);
 

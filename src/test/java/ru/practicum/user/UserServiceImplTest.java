@@ -13,9 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
-
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -160,33 +158,38 @@ class UserServiceImplTest {
     void update_WhenEmailIsUnique_ShouldUpdateUser() {
         Long userId = 1L;
         UserDto userDto = new UserDto();
-        userDto.setId(userId);
         userDto.setName("John Updated");
         userDto.setEmail("updated@example.com");
 
+        User userFromDto = new User();
+        userFromDto.setId(userId);
+        userFromDto.setName(userDto.getName());
+        userFromDto.setEmail(userDto.getEmail());
+        when(userMapper.toUser(userDto)).thenReturn(userFromDto);
+
+        when(userRepository.existsByEmailAndIdNot(userDto.getEmail(), userId)).thenReturn(false);
+
         User updatedUser = new User();
         updatedUser.setId(userId);
-        updatedUser.setName("John Updated");
-        updatedUser.setEmail("updated@example.com");
+        updatedUser.setName(userDto.getName());
+        updatedUser.setEmail(userDto.getEmail());
+        when(userRepository.update(any(User.class))).thenReturn(updatedUser);
 
-        UserResponseDto expectedResponse = new UserResponseDto();
-        expectedResponse.setId(userId);
-        expectedResponse.setName("John Updated");
-        expectedResponse.setEmail("updated@example.com");
-
-        when(userRepository.existsByEmail(userDto.getEmail())).thenReturn(false);
-        when(userRepository.update(userDto)).thenReturn(updatedUser);
-        when(userMapper.toResponseDto(updatedUser)).thenReturn(expectedResponse);
+        UserResponseDto responseDto = new UserResponseDto();
+        responseDto.setId(userId);
+        responseDto.setName(userDto.getName());
+        responseDto.setEmail(userDto.getEmail());
+        when(userMapper.toResponseDto(updatedUser)).thenReturn(responseDto);
 
         UserResponseDto result = userService.update(userDto, userId);
 
         assertNotNull(result);
-        assertEquals(expectedResponse.getId(), result.getId());
-        assertEquals(expectedResponse.getName(), result.getName());
-        assertEquals(expectedResponse.getEmail(), result.getEmail());
+        assertEquals(userDto.getName(), result.getName());
+        assertEquals(userDto.getEmail(), result.getEmail());
 
-        verify(userRepository).existsByEmail(userDto.getEmail());
-        verify(userRepository).update(userDto);
+        verify(userRepository).existsByEmailAndIdNot(userDto.getEmail(), userId);
+        verify(userMapper).toUser(userDto);
+        verify(userRepository).update(userFromDto);
         verify(userMapper).toResponseDto(updatedUser);
     }
 
@@ -197,11 +200,11 @@ class UserServiceImplTest {
         userDto.setId(userId);
         userDto.setEmail("exists@example.com");
 
-        when(userRepository.existsByEmail(userDto.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmailAndIdNot(userDto.getEmail(), userId)).thenReturn(true);
 
         assertThrows(EmailAlreadyExistsException.class, () -> userService.update(userDto, userId));
 
-        verify(userRepository).existsByEmail(userDto.getEmail());
+        verify(userRepository).existsByEmailAndIdNot(userDto.getEmail(), userId);
         verify(userRepository, never()).findById(any());
         verify(userRepository, never()).update(any());
     }

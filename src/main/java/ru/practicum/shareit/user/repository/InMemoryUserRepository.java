@@ -38,7 +38,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User update(UserDto user) {
+    public User update(User user) {
         log.info("Обновляю пользователя по Ид : {}", user.getId());
         User userFromMemory = findById(user.getId());
 
