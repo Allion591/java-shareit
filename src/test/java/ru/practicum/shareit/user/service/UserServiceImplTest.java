@@ -1,4 +1,4 @@
-package ru.practicum.user.service;
+package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.dto.UserResponseDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +34,6 @@ class UserServiceImplTest {
 
     @Test
     void create_ShouldCreateUserAndReturnResponseDto() {
-        // Given
         UserDto userDto = new UserDto();
         userDto.setName("John Doe");
         userDto.setEmail("john@example.com");
@@ -55,10 +53,8 @@ class UserServiceImplTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponseDto(user)).thenReturn(expectedResponse);
 
-        // When
         UserResponseDto result = userService.create(userDto);
 
-        // Then
         assertNotNull(result);
         assertEquals(expectedResponse.getId(), result.getId());
         assertEquals(expectedResponse.getName(), result.getName());
@@ -72,13 +68,11 @@ class UserServiceImplTest {
 
     @Test
     void create_WhenEmailExists_ShouldThrowException() {
-        // Given
         UserDto userDto = new UserDto();
         userDto.setEmail("exists@example.com");
 
         when(userRepository.existsByEmail(userDto.getEmail())).thenReturn(true);
 
-        // When & Then
         assertThrows(EmailAlreadyExistsException.class, () -> userService.create(userDto));
 
         verify(userRepository).existsByEmail(userDto.getEmail());
@@ -88,7 +82,6 @@ class UserServiceImplTest {
 
     @Test
     void getById_WhenUserExists_ShouldReturnUser() {
-        // Given
         Long userId = 1L;
         User user = new User();
         user.setId(userId);
@@ -103,10 +96,8 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userMapper.toResponseDto(user)).thenReturn(expectedResponse);
 
-        // When
         UserResponseDto result = userService.getById(userId);
 
-        // Then
         assertNotNull(result);
         assertEquals(expectedResponse.getId(), result.getId());
         assertEquals(expectedResponse.getName(), result.getName());
@@ -118,12 +109,10 @@ class UserServiceImplTest {
 
     @Test
     void getById_WhenUserNotExists_ShouldThrowException() {
-        // Given
         Long userId = 999L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(NotFoundException.class, () -> userService.getById(userId));
 
         verify(userRepository).findById(userId);
@@ -132,7 +121,6 @@ class UserServiceImplTest {
 
     @Test
     void getAllUsers_ShouldReturnListOfUsers() {
-        // Given
         User user1 = new User();
         user1.setId(1L);
         user1.setName("John Doe");
@@ -157,10 +145,8 @@ class UserServiceImplTest {
         when(userMapper.toResponseDto(user1)).thenReturn(response1);
         when(userMapper.toResponseDto(user2)).thenReturn(response2);
 
-        // When
         List<UserResponseDto> result = userService.getAllUsers();
 
-        // Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(response1, result.get(0));
@@ -172,13 +158,10 @@ class UserServiceImplTest {
 
     @Test
     void getAllUsers_WhenNoUsers_ShouldReturnEmptyList() {
-        // Given
         when(userRepository.findAll()).thenReturn(List.of());
 
-        // When
         List<UserResponseDto> result = userService.getAllUsers();
 
-        // Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
@@ -188,7 +171,6 @@ class UserServiceImplTest {
 
     @Test
     void update_WhenUserExistsAndEmailIsUnique_ShouldUpdateUser() {
-        // Given
         Long userId = 1L;
         UserPatchDto userPatchDto = new UserPatchDto();
         userPatchDto.setName(Optional.of("John Updated"));
@@ -214,10 +196,8 @@ class UserServiceImplTest {
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
         when(userMapper.toResponseDto(updatedUser)).thenReturn(expectedResponse);
 
-        // When
         UserResponseDto result = userService.update(userPatchDto, userId);
 
-        // Then
         assertNotNull(result);
         assertEquals(expectedResponse.getName(), result.getName());
         assertEquals(expectedResponse.getEmail(), result.getEmail());
@@ -230,7 +210,6 @@ class UserServiceImplTest {
 
     @Test
     void update_WhenUserExistsAndEmailNotChanged_ShouldUpdateUser() {
-        // Given
         Long userId = 1L;
         UserPatchDto userPatchDto = new UserPatchDto();
         userPatchDto.setName(Optional.of("John Updated"));
@@ -256,10 +235,8 @@ class UserServiceImplTest {
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
         when(userMapper.toResponseDto(updatedUser)).thenReturn(expectedResponse);
 
-        // When
         UserResponseDto result = userService.update(userPatchDto, userId);
 
-        // Then
         assertNotNull(result);
         assertEquals(expectedResponse.getName(), result.getName());
         assertEquals(expectedResponse.getEmail(), result.getEmail());
@@ -272,7 +249,6 @@ class UserServiceImplTest {
 
     @Test
     void update_WhenUserExistsAndEmailExists_ShouldThrowException() {
-        // Given
         Long userId = 1L;
         UserPatchDto userPatchDto = new UserPatchDto();
         userPatchDto.setEmail(Optional.of("exists@example.com"));
@@ -284,7 +260,6 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
         when(userRepository.existsByEmailAndIdNot("exists@example.com", userId)).thenReturn(true);
 
-        // When & Then
         assertThrows(EmailAlreadyExistsException.class, () -> userService.update(userPatchDto, userId));
 
         verify(userRepository).findById(userId);
@@ -294,14 +269,12 @@ class UserServiceImplTest {
 
     @Test
     void update_WhenUserNotExists_ShouldThrowException() {
-        // Given
         Long userId = 999L;
         UserPatchDto userPatchDto = new UserPatchDto();
         userPatchDto.setName(Optional.of("Updated Name"));
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(NotFoundException.class, () -> userService.update(userPatchDto, userId));
 
         verify(userRepository).findById(userId);
@@ -311,7 +284,6 @@ class UserServiceImplTest {
 
     @Test
     void update_WhenOnlyNameProvided_ShouldUpdateOnlyName() {
-        // Given
         Long userId = 1L;
         UserPatchDto userPatchDto = new UserPatchDto();
         userPatchDto.setName(Optional.of("John Updated"));
@@ -336,10 +308,8 @@ class UserServiceImplTest {
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
         when(userMapper.toResponseDto(updatedUser)).thenReturn(expectedResponse);
 
-        // When
         UserResponseDto result = userService.update(userPatchDto, userId);
 
-        // Then
         assertNotNull(result);
         assertEquals("John Updated", result.getName());
         assertEquals("john@example.com", result.getEmail());
@@ -352,7 +322,6 @@ class UserServiceImplTest {
 
     @Test
     void update_WhenOnlyEmailProvided_ShouldUpdateOnlyEmail() {
-        // Given
         Long userId = 1L;
         UserPatchDto userPatchDto = new UserPatchDto();
         userPatchDto.setName(Optional.empty());
@@ -378,10 +347,8 @@ class UserServiceImplTest {
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
         when(userMapper.toResponseDto(updatedUser)).thenReturn(expectedResponse);
 
-        // When
         UserResponseDto result = userService.update(userPatchDto, userId);
 
-        // Then
         assertNotNull(result);
         assertEquals("John Old", result.getName());
         assertEquals("new@example.com", result.getEmail());
@@ -394,21 +361,17 @@ class UserServiceImplTest {
 
     @Test
     void deleteById_ShouldDeleteUser() {
-        // Given
         Long userId = 1L;
 
         doNothing().when(userRepository).deleteById(userId);
 
-        // When
         userService.deleteById(userId);
 
-        // Then
         verify(userRepository).deleteById(userId);
     }
 
     @Test
     void findById_WhenUserExists_ShouldReturnUser() {
-        // Given
         Long userId = 1L;
         User expectedUser = new User();
         expectedUser.setId(userId);
@@ -417,10 +380,8 @@ class UserServiceImplTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
 
-        // When
         User result = userService.findById(userId);
 
-        // Then
         assertNotNull(result);
         assertEquals(expectedUser.getId(), result.getId());
         assertEquals(expectedUser.getName(), result.getName());
@@ -431,12 +392,10 @@ class UserServiceImplTest {
 
     @Test
     void findById_WhenUserNotExists_ShouldThrowException() {
-        // Given
         Long userId = 999L;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(NotFoundException.class, () -> userService.findById(userId));
 
         verify(userRepository).findById(userId);

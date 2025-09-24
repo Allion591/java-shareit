@@ -1,4 +1,4 @@
-package ru.practicum.user.controller;
+package ru.practicum.shareit.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserPatchDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
@@ -36,7 +35,6 @@ class UserControllerTest {
 
     @Test
     void saveNewUser_ShouldReturnCreatedUser() throws Exception {
-        // Given
         UserDto userDto = new UserDto();
         userDto.setName("John Doe");
         userDto.setEmail("john@example.com");
@@ -48,7 +46,6 @@ class UserControllerTest {
 
         when(userService.create(any(UserDto.class))).thenReturn(responseDto);
 
-        // When & Then
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
@@ -60,7 +57,6 @@ class UserControllerTest {
 
     @Test
     void getUserById_ShouldReturnUser() throws Exception {
-        // Given
         UserResponseDto responseDto = new UserResponseDto();
         responseDto.setId(1L);
         responseDto.setName("John Doe");
@@ -68,7 +64,6 @@ class UserControllerTest {
 
         when(userService.getById(1L)).thenReturn(responseDto);
 
-        // When & Then
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -78,7 +73,6 @@ class UserControllerTest {
 
     @Test
     void getAllUsers_ShouldReturnUsersList() throws Exception {
-        // Given
         UserResponseDto user1 = new UserResponseDto();
         user1.setId(1L);
         user1.setName("John Doe");
@@ -91,7 +85,6 @@ class UserControllerTest {
 
         when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
 
-        // When & Then
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
@@ -101,7 +94,6 @@ class UserControllerTest {
 
     @Test
     void updateUser_ShouldReturnUpdatedUser() throws Exception {
-        // Given
         UserPatchDto patchDto = new UserPatchDto();
         patchDto.setName(Optional.of("John Updated"));
         patchDto.setEmail(Optional.of("updated@example.com"));
@@ -113,7 +105,6 @@ class UserControllerTest {
 
         when(userService.update(any(UserPatchDto.class), anyLong())).thenReturn(responseDto);
 
-        // When & Then
         mockMvc.perform(patch("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patchDto)))
@@ -125,7 +116,6 @@ class UserControllerTest {
 
     @Test
     void deleteUserById_ShouldReturnNoContent() throws Exception {
-        // When & Then
         mockMvc.perform(delete("/users/1"))
                 .andExpect(status().isNoContent());
     }
