@@ -23,7 +23,7 @@ public interface ItemService {
 
     Item findById(Long itemId);
 
-    void deleteItem(Long userId, Long itemId);
+    void deleteItem(Long itemId, Long userId);
 
     CommentResponseDto save(Long userId, Long itemId, CommentDto commentDto);
 
