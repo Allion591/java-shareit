@@ -84,14 +84,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponseDto update(ItemPatchDto itemPatchDto, Long itemId, Long ownerId) {
-        log.info("Сервис вещей принял запрос на обновление вещи : {}, владелец {}", itemPatchDto.getName(), ownerId);
+        log.info("Сервис вещей принял запрос на обновление вещи: {}, владелец {}", itemPatchDto.getName(), ownerId);
+
         userService.getById(ownerId);
         itemPatchDto.setId(itemId);
-        Optional<Item> existingItem = itemRepository.findById(itemPatchDto.getId());
-        if (!existingItem.get().getOwner().getId().equals(ownerId)) {
+
+        Optional<Item> existingItemOpt = itemRepository.findById(itemId);
+        if (existingItemOpt.isEmpty()) {
+            throw new NotFoundException("Вещь с ID " + itemId + " не найдена");
+        }
+
+        Item existingItem = existingItemOpt.get();
+
+        if (!existingItem.getOwner().getId().equals(ownerId)) {
             throw new NotOwnerException("Только владелец может редактировать вещь");
         }
-        Item updatedItem = itemMapper.updateItemFromPatchDto(itemPatchDto, existingItem.get());
+
+        Item updatedItem = itemMapper.updateItemFromPatchDto(itemPatchDto, existingItem);
         Item savedItem = itemRepository.save(updatedItem);
         return itemMapper.toResponseDto(savedItem);
     }
@@ -143,9 +152,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void deleteItem(Long userId, Long itemId) {
+    public void deleteItem(Long itemId, Long userId) {
         log.info("Сервис вещей принял запрос на удаление вещи : {}, пользователь {}", itemId, userId);
-        itemRepository.deleteByIdAndOwnerId(userId, itemId);
+        itemRepository.deleteByIdAndOwnerId(itemId, userId);
     }
 
     @Override
