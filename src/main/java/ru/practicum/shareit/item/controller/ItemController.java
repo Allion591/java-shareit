@@ -63,7 +63,7 @@ public class ItemController {
     public void deleteItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                            @PathVariable(name = "itemId") Long itemId) {
         log.info("Принял запрос на удаление вещи: ид пользователя {}, ид вещи {}", userId, itemId);
-        itemService.deleteItem(userId, itemId);
+        itemService.deleteItem(itemId, userId);
     }
 
     @PostMapping("/{itemId}/comment")
