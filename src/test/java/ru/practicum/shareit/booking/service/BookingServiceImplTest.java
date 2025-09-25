@@ -91,7 +91,7 @@ class BookingServiceImplTest {
 
         when(userService.findById(anyLong())).thenReturn(testUser);
         when(itemService.findById(anyLong())).thenReturn(testItem);
-        when(bookingRepository.existsByItemIdAndStartLessThanEqualAndEndGreaterThanEqualAndStatusIn(anyLong(),
+        when(bookingRepository.existsOverlappingBooking(anyLong(),
                 any(LocalDateTime.class), any(LocalDateTime.class), any())).thenReturn(false);
         when(bookingMapper.toBooking(any(BookingDto.class))).thenReturn(testBooking);
         when(bookingRepository.save(any(Booking.class))).thenReturn(testBooking);
@@ -115,7 +115,7 @@ class BookingServiceImplTest {
         when(userService.findById(anyLong())).thenReturn(testUser);
         when(itemService.findById(anyLong())).thenReturn(testItem);
 
-        assertThrows(NotOwnerException.class, () -> bookingService.create(bookingDto, 1L));
+        assertThrows(ValidationException.class, () -> bookingService.create(bookingDto, 1L));
     }
 
     @Test
