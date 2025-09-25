@@ -44,14 +44,20 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByItemOwnerIdAndStartAfterOrderByStartDesc(Long ownerId, LocalDateTime start,
                                                                  Pageable pageable);
 
-    boolean existsByItemIdAndStartLessThanEqualAndEndGreaterThanEqualAndStatusIn(
-            Long itemId, LocalDateTime start, LocalDateTime end, Collection<BookingStatus> statuses);
+    @Query("""
+    SELECT COUNT(b) > 0
+    FROM Booking b
+    WHERE b.item.id = :itemId
+      AND b.status IN :statuses
+      AND b.start <= :endDate
+      AND b.end >= :startDate
+    """)
+    boolean existsOverlappingBooking(
+            @Param("itemId") Long itemId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("statuses") Collection<BookingStatus> statuses);
 
-    Optional<Booking> findFirstByItemIdAndStatusAndStartLessThanEqualOrderByStartDesc(
-            Long itemId, BookingStatus status, LocalDateTime date);
-
-    Optional<Booking> findFirstByItemIdAndStatusAndStartAfterOrderByStartAsc(
-            Long itemId, BookingStatus status, LocalDateTime date);
 
     @Query("SELECT COUNT(b) > 0 FROM Booking b " +
             "WHERE b.booker.id = :userId " +
