@@ -336,7 +336,7 @@ class ItemServiceImplTest {
 
         doNothing().when(itemRepository).deleteByIdAndOwnerId(userId, itemId);
 
-        itemService.deleteItem(userId, itemId);
+        itemService.deleteItem(itemId, userId);
 
         verify(itemRepository).deleteByIdAndOwnerId(userId, itemId);
     }
