@@ -38,27 +38,29 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponseDto create(BookingDto bookingRequestDto, Long userId) {
         log.info("Сервис сохраняет бронирование вещи {}", bookingRequestDto.getItemId());
+
+        // Проверка корректности дат
         if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd())) {
             throw new ValidationException("Дата окончания должна быть позже даты старта");
         }
 
         if (bookingRequestDto.getStart().isEqual(bookingRequestDto.getEnd())) {
-            throw new ValidationException("Дата начала и дата окончания не сравнились");
+            throw new ValidationException("Дата начала и окончания не могут совпадать");
         }
 
         User booker = userService.findById(userId);
         Item item = itemService.findById(bookingRequestDto.getItemId());
 
         if (item.getOwner().getId().equals(userId)) {
-            throw new NotOwnerException("Вы не владелец цещи");
+            throw new ValidationException("Владелец не может бронировать свою собственную вещь");
         }
 
         if (!item.isAvailable()) {
-            throw new ValidationException("Вещь не доступна");
+            throw new ValidationException("Вещь не доступна для бронирования");
         }
 
-        if (bookingRepository.existsByItemIdAndStartLessThanEqualAndEndGreaterThanEqualAndStatusIn(
-                item.getId(), bookingRequestDto.getEnd(), bookingRequestDto.getStart(),
+        if (bookingRepository.existsOverlappingBooking(
+                item.getId(), bookingRequestDto.getStart(), bookingRequestDto.getEnd(),
                 Arrays.asList(BookingStatus.APPROVED, BookingStatus.WAITING))) {
             throw new ValidationException("Вещь уже забронирована на данный период");
         }
@@ -67,6 +69,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setItem(item);
         booking.setBooker(booker);
         booking.setStatus(BookingStatus.WAITING);
+
         log.info("Сервис сохранил бронирование вещи {}", booking.getItem().getId());
         return bookingMapper.toResponseDto(bookingRepository.save(booking));
     }
