@@ -23,6 +23,6 @@ public class User {
     private String name;
 
     @CreationTimestamp
-    @Column(name = "registrationDate", nullable = false)
-    private final LocalDateTime registrationDate = LocalDateTime.now();
+    @Column(name = "registration_date", nullable = false, updatable = false)
+    private LocalDateTime registrationDate;
 }
