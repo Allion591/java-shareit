@@ -92,7 +92,6 @@ class UserServiceImplTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userMapper.toResponseDto(any(User.class))).thenReturn(responseDto);
-
         UserResponseDto result = userService.getById(userId);
 
         assertNotNull(result);
