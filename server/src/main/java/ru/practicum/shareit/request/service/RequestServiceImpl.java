@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
@@ -29,6 +30,7 @@ public class RequestServiceImpl implements RequestService {
     private final ItemMapper itemMapper;
 
     @Override
+    @Transactional
     public ItemRequestResponseDto create(ItemRequestDto itemRequestDto, Long userId) {
         User user = userService.findById(userId);
         return itemRequestMapper.toResponseDto(itemRequestRepository.save(
@@ -36,6 +38,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public ItemRequestResponseDto update(ItemRequest itemRequest) {
         return itemRequestMapper.toResponseDto(itemRequestRepository.save(itemRequest));
     }
@@ -75,6 +78,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public void deleteRequestById(Long requestId) {
         itemRequestRepository.deleteRequestById(requestId);
     }

@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public UserResponseDto create(UserDto userDto) {
         log.info("Сервис пользователей принял запрос на создание : {}", userDto.getName());
         if (repository.existsByEmail(userDto.getEmail())) {
@@ -51,6 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponseDto update(UserPatchDto userPatchDto, Long userId) {
         log.info("Сервис пользователей принял запрос на обновление пользователя с Ид: {}", userId);
 
@@ -69,6 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long userId) {
         log.info("Сервис пользователей принял запрос удаление пользователя с Ид : {}", userId);
         repository.deleteById(userId);

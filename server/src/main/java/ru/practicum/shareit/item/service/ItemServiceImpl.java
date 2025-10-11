@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -43,6 +44,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingMapper bookingMapper;
 
     @Override
+    @Transactional
     public ItemResponseDto create(ItemDto itemDto, Long ownerId) {
         userService.getById(ownerId);
         User user = new User();
@@ -83,6 +85,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemResponseDto update(ItemPatchDto itemPatchDto, Long itemId, Long ownerId) {
         log.info("Сервис вещей принял запрос на обновление вещи: {}, владелец {}", itemPatchDto.getName(), ownerId);
 
@@ -135,7 +138,6 @@ public class ItemServiceImpl implements ItemService {
                 .map(item -> {
                     ItemResponseDto dto = itemMapper.toResponseDto(item);
 
-                    // Для владельца показываем информацию о бронированиях
                     Optional<Booking> lastBooking = bookingRepository.findLastBooking(item.getId(),
                             BookingStatus.APPROVED, now);
                     Optional<Booking> nextBooking = bookingRepository.findNextBooking(item.getId(),
@@ -152,6 +154,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteItem(Long itemId, Long userId) {
         log.info("Сервис вещей принял запрос на удаление вещи : {}, пользователь {}", itemId, userId);
         itemRepository.deleteByIdAndOwnerId(itemId, userId);
@@ -167,11 +170,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentResponseDto save(Long userId, Long itemId, CommentDto commentDto) {
         log.info("Сохраняю комментарии {}, {}", userId, itemId);
         User author = userService.findById(userId);
         Item item = findById(itemId);
-
         boolean hasCompletedBooking = bookingRepository.existsCompletedBookingByUserAndItem(userId,
                 itemId, BookingStatus.APPROVED, LocalDateTime.now());
 

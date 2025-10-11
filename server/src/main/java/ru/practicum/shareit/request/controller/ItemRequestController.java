@@ -38,7 +38,8 @@ public class ItemRequestController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size) {
-        log.info("Сервер получил запрос на получение всех запросов от других пользователей от пользователя ID: {}", userId);
+        log.info("Сервер получил запрос на получение всех запросов от других пользователей от пользователя ID: {}",
+                userId);
         return requestService.getAllOtherUsersRequests(userId, from, size);
     }
 
