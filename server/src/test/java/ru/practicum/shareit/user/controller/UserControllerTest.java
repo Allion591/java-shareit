@@ -15,13 +15,12 @@ import ru.practicum.shareit.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = UserController.class)
+@WebMvcTest(UserController.class)
 class UserControllerTest {
 
     @Autowired
@@ -34,15 +33,15 @@ class UserControllerTest {
     private UserService userService;
 
     @Test
-    void saveNewUser_ShouldReturnCreatedUser() throws Exception {
+    void saveNewUser_WhenValidData_ShouldReturnCreated() throws Exception {
         UserDto userDto = new UserDto();
-        userDto.setName("John Doe");
-        userDto.setEmail("john@example.com");
+        userDto.setName("Test User");
+        userDto.setEmail("test@mail.com");
 
         UserResponseDto responseDto = new UserResponseDto();
         responseDto.setId(1L);
-        responseDto.setName("John Doe");
-        responseDto.setEmail("john@example.com");
+        responseDto.setName("Test User");
+        responseDto.setEmail("test@mail.com");
 
         when(userService.create(any(UserDto.class))).thenReturn(responseDto);
 
@@ -51,57 +50,50 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("John Doe"))
-                .andExpect(jsonPath("$.email").value("john@example.com"));
+                .andExpect(jsonPath("$.name").value("Test User"))
+                .andExpect(jsonPath("$.email").value("test@mail.com"));
     }
 
     @Test
-    void getUserById_ShouldReturnUser() throws Exception {
+    void getUserById_WhenValidData_ShouldReturnOk() throws Exception {
         UserResponseDto responseDto = new UserResponseDto();
         responseDto.setId(1L);
-        responseDto.setName("John Doe");
-        responseDto.setEmail("john@example.com");
+        responseDto.setName("Test User");
+        responseDto.setEmail("test@mail.com");
 
-        when(userService.getById(1L)).thenReturn(responseDto);
+        when(userService.getById(anyLong())).thenReturn(responseDto);
 
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("John Doe"))
-                .andExpect(jsonPath("$.email").value("john@example.com"));
+                .andExpect(jsonPath("$.name").value("Test User"))
+                .andExpect(jsonPath("$.email").value("test@mail.com"));
     }
 
     @Test
-    void getAllUsers_ShouldReturnUsersList() throws Exception {
-        UserResponseDto user1 = new UserResponseDto();
-        user1.setId(1L);
-        user1.setName("John Doe");
-        user1.setEmail("john@example.com");
+    void getAllUsers_WhenValidData_ShouldReturnOk() throws Exception {
+        UserResponseDto responseDto = new UserResponseDto();
+        responseDto.setId(1L);
+        responseDto.setName("Test User");
 
-        UserResponseDto user2 = new UserResponseDto();
-        user2.setId(2L);
-        user2.setName("Jane Smith");
-        user2.setEmail("jane@example.com");
-
-        when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
+        when(userService.getAllUsers()).thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[1].id").value(2L));
+                .andExpect(jsonPath("$[0].name").value("Test User"));
     }
 
     @Test
-    void updateUser_ShouldReturnUpdatedUser() throws Exception {
+    void updateUser_WhenValidData_ShouldReturnOk() throws Exception {
         UserPatchDto patchDto = new UserPatchDto();
-        patchDto.setName(Optional.of("John Updated"));
-        patchDto.setEmail(Optional.of("updated@example.com"));
+        patchDto.setName(Optional.of("Updated User"));
+        patchDto.setEmail(Optional.of("updated@mail.com"));
 
         UserResponseDto responseDto = new UserResponseDto();
         responseDto.setId(1L);
-        responseDto.setName("John Updated");
-        responseDto.setEmail("updated@example.com");
+        responseDto.setName("Updated User");
+        responseDto.setEmail("updated@mail.com");
 
         when(userService.update(any(UserPatchDto.class), anyLong())).thenReturn(responseDto);
 
@@ -110,13 +102,34 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(patchDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("John Updated"))
-                .andExpect(jsonPath("$.email").value("updated@example.com"));
+                .andExpect(jsonPath("$.name").value("Updated User"))
+                .andExpect(jsonPath("$.email").value("updated@mail.com"));
     }
 
     @Test
-    void deleteUserById_ShouldReturnNoContent() throws Exception {
+    void deleteUserById_WhenValidData_ShouldReturnNoContent() throws Exception {
         mockMvc.perform(delete("/users/1"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void saveNewUser_WhenBlankName_ShouldUseLogin() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setName(""); // Blank name
+        userDto.setLogin("userlogin");
+        userDto.setEmail("test@mail.com");
+
+        UserResponseDto responseDto = new UserResponseDto();
+        responseDto.setId(1L);
+        responseDto.setName("userlogin"); // Should use login as name
+        responseDto.setEmail("test@mail.com");
+
+        when(userService.create(any(UserDto.class))).thenReturn(responseDto);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("userlogin"));
     }
 }

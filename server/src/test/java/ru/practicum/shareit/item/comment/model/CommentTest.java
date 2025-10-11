@@ -48,4 +48,40 @@ class CommentTest {
         assertEquals(comment1.hashCode(), comment2.hashCode());
         assertNotEquals(comment1, comment3);
     }
+
+    @Test
+    void commentNoArgsConstructor_ShouldCreateEmptyComment() {
+        Comment comment = new Comment();
+
+        assertNotNull(comment);
+        assertNull(comment.getId());
+        assertNull(comment.getText());
+        assertNull(comment.getAuthor());
+        assertNull(comment.getItem());
+        assertNull(comment.getCreated());
+    }
+
+    @Test
+    void commentEquals_WithSameObject_ShouldReturnTrue() {
+        Comment comment = new Comment();
+        comment.setId(1L);
+
+        assertEquals(comment, comment);
+    }
+
+    @Test
+    void commentEquals_WithNull_ShouldReturnFalse() {
+        Comment comment = new Comment();
+        comment.setId(1L);
+
+        assertNotEquals(null, comment);
+    }
+
+    @Test
+    void commentEquals_WithDifferentClass_ShouldReturnFalse() {
+        Comment comment = new Comment();
+        comment.setId(1L);
+
+        assertNotEquals("string", comment);
+    }
 }

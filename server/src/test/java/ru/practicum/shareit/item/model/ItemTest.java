@@ -53,4 +53,38 @@ class ItemTest {
         assertTrue(toString.contains("Test Item"));
         assertTrue(toString.contains("Test Description"));
     }
+
+    @Test
+    void itemNoArgsConstructor_ShouldCreateEmptyItem() {
+        Item item = new Item();
+
+        assertNotNull(item);
+        assertNull(item.getId());
+        assertNull(item.getName());
+        assertNull(item.getDescription());
+        assertNull(item.getOwner());
+        assertNull(item.getRequestId());
+    }
+
+    @Test
+    void itemEquals_WithDifferentId_ShouldReturnFalse() {
+        Item item1 = new Item();
+        item1.setId(1L);
+
+        Item item2 = new Item();
+        item2.setId(2L);
+
+        assertNotEquals(item1, item2);
+    }
+
+    @Test
+    void itemHashCode_WithSameId_ShouldBeEqual() {
+        Item item1 = new Item();
+        item1.setId(1L);
+
+        Item item2 = new Item();
+        item2.setId(1L);
+
+        assertEquals(item1.hashCode(), item2.hashCode());
+    }
 }

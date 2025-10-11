@@ -1,11 +1,10 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item.comment.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

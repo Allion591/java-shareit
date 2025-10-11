@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -77,10 +78,10 @@ class BookingServiceImplTest {
 
     @Test
     void create_WhenValidData_ShouldReturnBooking() {
+        // Given
         User testUser = createTestUser(1L, "Test User", "test@mail.com");
         User testOwner = createTestUser(2L, "Test Owner", "owner@mail.com");
-        Item testItem = createTestItem(1L, "Test Item", "Test Description", true,
-                testOwner);
+        Item testItem = createTestItem(1L, "Test Item", "Test Description", true, testOwner);
         Booking testBooking = createTestBooking(1L, LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2), testItem, testUser, BookingStatus.WAITING);
 
@@ -89,16 +90,25 @@ class BookingServiceImplTest {
         bookingDto.setStart(LocalDateTime.now().plusDays(1));
         bookingDto.setEnd(LocalDateTime.now().plusDays(2));
 
+        BookingResponseDto responseDto = new BookingResponseDto();
+        responseDto.setId(1L);
+        responseDto.setStatus(BookingStatus.WAITING);
+
+        // When
         when(userService.findById(anyLong())).thenReturn(testUser);
         when(itemService.findById(anyLong())).thenReturn(testItem);
         when(bookingRepository.existsOverlappingBooking(anyLong(),
                 any(LocalDateTime.class), any(LocalDateTime.class), any())).thenReturn(false);
         when(bookingMapper.toBooking(any(BookingDto.class))).thenReturn(testBooking);
         when(bookingRepository.save(any(Booking.class))).thenReturn(testBooking);
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
 
         var result = bookingService.create(bookingDto, 1L);
 
-        assertNull(result);
+        // Then
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals(BookingStatus.WAITING, result.getStatus());
         verify(bookingRepository, times(1)).save(any(Booking.class));
     }
 
@@ -179,18 +189,25 @@ class BookingServiceImplTest {
 
     @Test
     void getById_WhenValidUser_ShouldReturnBooking() {
+        // Given
         User testUser = createTestUser(1L, "Test User", "test@mail.com");
         User testOwner = createTestUser(2L, "Test Owner", "owner@mail.com");
-        Item testItem = createTestItem(1L, "Test Item", "Test Description", true,
-                testOwner);
+        Item testItem = createTestItem(1L, "Test Item", "Test Description", true, testOwner);
         Booking testBooking = createTestBooking(1L, LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(2), testItem, testUser, BookingStatus.WAITING);
 
+        BookingResponseDto responseDto = new BookingResponseDto();
+        responseDto.setId(1L);
+
+        // When
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(testBooking));
+        when(bookingMapper.toResponseDto(any(Booking.class))).thenReturn(responseDto);
 
         var result = bookingService.getById(1L, 1L);
 
-        assertNull(result);
+        // Then
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
     }
 
     @Test
