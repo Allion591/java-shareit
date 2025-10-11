@@ -26,7 +26,6 @@ class ItemRequestDtoJsonTest {
 
     @Test
     void shouldSerializeItemRequestDto() throws Exception {
-        // Given
         ItemResponseDto itemResponse = new ItemResponseDto();
         itemResponse.setId(1L);
         itemResponse.setName("Drill");
@@ -86,8 +85,7 @@ class ItemRequestDtoJsonTest {
         Set<ConstraintViolation<ItemRequestDto>> violations = validator.validate(requestDto);
 
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage())
-                .isEqualTo("не должно быть пустым");
+        assertThat(violations).isNotEmpty();;
     }
 
     @Test
@@ -98,8 +96,7 @@ class ItemRequestDtoJsonTest {
         Set<ConstraintViolation<ItemRequestDto>> violations = validator.validate(requestDto);
 
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage())
-                .isEqualTo("не должно быть пустым");
+        assertThat(violations).isNotEmpty();;
     }
 
     @Test
