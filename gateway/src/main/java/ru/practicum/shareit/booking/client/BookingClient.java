@@ -54,6 +54,6 @@ public class BookingClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        return getList("/" + userId, userId, parameters);
+        return getList("/owner" + userId, userId, parameters);
     }
 }
