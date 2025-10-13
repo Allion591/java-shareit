@@ -53,7 +53,7 @@ public class RequestServiceImpl implements RequestService {
                 .map(request -> {
                     ItemRequestResponseDto responseDto = itemRequestMapper.toResponseDto(request);
                     List<Item> items = itemRepository.findByRequestId(request.getId());
-                    responseDto.setItems(itemMapper.toResponseDtoList(items));
+                    responseDto.setItems(itemMapper.itemResponseDtoShorts(items));
                     return responseDto;
                 })
                 .collect(Collectors.toList());
@@ -71,7 +71,7 @@ public class RequestServiceImpl implements RequestService {
                 .map(request -> {
                     ItemRequestResponseDto responseDto = itemRequestMapper.toResponseDto(request);
                     List<Item> items = itemRepository.findByRequestId(request.getId());
-                    responseDto.setItems(itemMapper.toResponseDtoList(items));
+                    responseDto.setItems(itemMapper.itemResponseDtoShorts(items));
                     return responseDto;
                 })
                 .collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class RequestServiceImpl implements RequestService {
         List<Item> items = itemRepository.findByRequestId(requestId);
 
         ItemRequestResponseDto responseDto = itemRequestMapper.toResponseDto(request);
-        responseDto.setItems(itemMapper.toResponseDtoList(items));
+        responseDto.setItems(itemMapper.itemResponseDtoShorts(items));
 
         return responseDto;
     }
