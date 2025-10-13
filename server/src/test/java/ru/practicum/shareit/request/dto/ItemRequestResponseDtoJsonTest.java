@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
-import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemResponseDtoShort;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,11 +19,10 @@ class ItemRequestResponseDtoJsonTest {
 
     @Test
     void shouldSerializeItemRequestResponseDto() throws JsonProcessingException {
-        ItemResponseDto itemDto = new ItemResponseDto();
+        ItemResponseDtoShort itemDto = new ItemResponseDtoShort();
         itemDto.setId(1L);
         itemDto.setName("Drill");
-        itemDto.setDescription("Powerful drill");
-        itemDto.setAvailable(true);
+        itemDto.setOwner(1L);
 
         ItemRequestResponseDto responseDto = new ItemRequestResponseDto();
         responseDto.setId(1L);

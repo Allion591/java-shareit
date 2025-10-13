@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemResponseDtoShort;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -107,7 +108,7 @@ class RequestServiceImplTest {
         when(itemRequestRepository.findByRequesterIdOrderByCreatedDesc(userId)).thenReturn(List.of(request1, request2));
         when(requestMapper.toResponseDto(any(ItemRequest.class))).thenReturn(responseDto1, responseDto2);
         when(itemRepository.findByRequestId(anyLong())).thenReturn(List.of());
-        when(itemMapper.toResponseDtoList(anyList())).thenReturn(List.of());
+        when(itemMapper.itemResponseDtoShorts(anyList())).thenReturn(List.of());
 
         List<ItemRequestResponseDto> result = requestService.getAllByUser(userId);
 
@@ -137,7 +138,7 @@ class RequestServiceImplTest {
                 .thenReturn(List.of(otherRequest));
         when(requestMapper.toResponseDto(any(ItemRequest.class))).thenReturn(responseDto);
         when(itemRepository.findByRequestId(anyLong())).thenReturn(List.of());
-        when(itemMapper.toResponseDtoList(anyList())).thenReturn(List.of());
+        when(itemMapper.itemResponseDtoShorts(anyList())).thenReturn(List.of());
 
         List<ItemRequestResponseDto> result = requestService.getAllOtherUsersRequests(userId, 0, 10);
 
@@ -167,7 +168,7 @@ class RequestServiceImplTest {
         when(itemRequestRepository.findById(requestId)).thenReturn(Optional.of(request));
         when(requestMapper.toResponseDto(any(ItemRequest.class))).thenReturn(responseDto);
         when(itemRepository.findByRequestId(requestId)).thenReturn(List.of());
-        when(itemMapper.toResponseDtoList(anyList())).thenReturn(List.of());
+        when(itemMapper.itemResponseDtoShorts(anyList())).thenReturn(List.of());
 
         ItemRequestResponseDto result = requestService.getById(requestId, userId);
 
@@ -235,7 +236,7 @@ class RequestServiceImplTest {
         item.setId(1L);
         item.setName("Test Item");
 
-        ru.practicum.shareit.item.dto.ItemResponseDto itemResponseDto = new ru.practicum.shareit.item.dto.ItemResponseDto();
+        ItemResponseDtoShort itemResponseDto = new ItemResponseDtoShort();
         itemResponseDto.setId(1L);
         itemResponseDto.setName("Test Item");
 
@@ -247,7 +248,7 @@ class RequestServiceImplTest {
         when(itemRequestRepository.findByRequesterIdOrderByCreatedDesc(userId)).thenReturn(List.of(request));
         when(requestMapper.toResponseDto(any(ItemRequest.class))).thenReturn(responseDto);
         when(itemRepository.findByRequestId(requestId)).thenReturn(List.of(item));
-        when(itemMapper.toResponseDtoList(anyList())).thenReturn(List.of(itemResponseDto));
+        when(itemMapper.itemResponseDtoShorts(anyList())).thenReturn(List.of(itemResponseDto));
 
         List<ItemRequestResponseDto> result = requestService.getAllByUser(userId);
 
