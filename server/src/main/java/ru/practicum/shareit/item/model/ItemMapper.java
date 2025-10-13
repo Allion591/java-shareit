@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.item.dto.ItemResponseDtoShort;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -60,9 +61,23 @@ public class ItemMapper {
         return itemResponseDto;
     }
 
+    public ItemResponseDtoShort itemResponseDtoShort(Item item) {
+        ItemResponseDtoShort dtoShort = new ItemResponseDtoShort();
+        dtoShort.setId(item.getId());
+        dtoShort.setName(item.getName());
+        dtoShort.setOwner(item.getOwner().getId());
+        return dtoShort;
+    }
+
     public List<ItemResponseDto> toResponseDtoList(List<Item> items) {
         return items.stream()
                 .map(this::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ItemResponseDtoShort> itemResponseDtoShorts(List<Item> items) {
+        return items.stream()
+                .map(this::itemResponseDtoShort)
                 .collect(Collectors.toList());
     }
 }
