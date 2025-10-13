@@ -1,9 +1,11 @@
 package ru.practicum.shareit.user.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.client.UserClient;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
@@ -26,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<Object> getUserById(@PathVariable @Min(1) Long userId) {
         log.info("Шлюз принял запрос на получение пользователя по Ид: {}", userId);
         return userClient.getById(userId);
     }
@@ -38,14 +41,14 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> updateUser(@PathVariable Long userId,
-                                             @RequestBody UserPatchDto userPatchDto) {
+    public ResponseEntity<Object> updateUser(@PathVariable @Min(1) Long userId,
+                                             @RequestBody @Valid UserPatchDto userPatchDto) {
         log.info("Шлюз принял запрос на обновление пользователя с Ид: {}", userId);
         return userClient.update(userId, userPatchDto);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUserById(@PathVariable Long userId) {
+    public void deleteUserById(@PathVariable @Min(1) Long userId) {
         log.info("Шлюз принял запрос на удаления пользователя с Ид: {}", userId);
         userClient.deleteById(userId);
     }
