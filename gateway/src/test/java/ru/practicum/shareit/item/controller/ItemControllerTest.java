@@ -15,7 +15,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -61,7 +60,7 @@ class ItemControllerTest {
     @Test
     void update_shouldReturnOk() throws Exception {
         ItemPatchDto itemPatchDto = new ItemPatchDto();
-        itemPatchDto.setName(Optional.of("Updated Name"));
+        itemPatchDto.setName("Updated Name");
         when(itemClient.update(any(ItemPatchDto.class), anyLong(), anyLong()))
                 .thenReturn(new ResponseEntity<>(itemPatchDto, HttpStatus.OK));
 

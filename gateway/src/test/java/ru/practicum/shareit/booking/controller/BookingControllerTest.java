@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -134,7 +135,8 @@ class BookingControllerTest {
     void getUserBookings_WhenValidData_ShouldReturnOk() throws Exception {
         ResponseEntity<List<Object>> responseEntity = ResponseEntity.ok().build();
 
-        when(bookingClient.getUserBookings(anyLong(), anyString(), anyInt(), anyInt())).thenReturn(responseEntity);
+        when(bookingClient.getUserBookings(anyLong(), anyString(), anyInt(), anyInt()))
+                .thenReturn(responseEntity);
 
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", 1L)
@@ -145,14 +147,40 @@ class BookingControllerTest {
     }
 
     @Test
-    void getUserBookings_WhenDefaultParameters_ShouldUseDefaults() throws Exception {
+    void getUserBookings_WhenDifferentState_ShouldPassCorrectState() throws Exception {
         ResponseEntity<List<Object>> responseEntity = ResponseEntity.ok().build();
 
-        when(bookingClient.getUserBookings(anyLong(), eq("ALL"), eq(0), eq(10))).thenReturn(responseEntity);
+        when(bookingClient.getUserBookings(anyLong(), anyString(), anyInt(), anyInt()))
+                .thenReturn(responseEntity);
 
         mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", 1L))
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state", "WAITING")
+                        .param("from", "5")
+                        .param("size", "20"))
                 .andExpect(status().isOk());
+
+        verify(bookingClient).getUserBookings(1L, "WAITING", 5, 20);
+    }
+
+    @Test
+    void getUserBookings_WhenInvalidState_ShouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state", "INVALID_STATE")
+                        .param("from", "0")
+                        .param("size", "10"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getUserBookings_WhenInvalidSize_ShouldReturnBadRequest() throws Exception {
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("state", "ALL")
+                        .param("from", "0")
+                        .param("size", "100")) // превышает максимальное значение 50
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -173,7 +201,8 @@ class BookingControllerTest {
     void getOwnerBookings_WhenDefaultParameters_ShouldUseDefaults() throws Exception {
         ResponseEntity<List<Object>> responseEntity = ResponseEntity.ok().build();
 
-        when(bookingClient.getOwnerBookings(anyLong(), eq("ALL"), eq(0), eq(10))).thenReturn(responseEntity);
+        when(bookingClient.getOwnerBookings(anyLong(), eq("ALL"), eq(0),
+                eq(10))).thenReturn(responseEntity);
 
         mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", 1L))

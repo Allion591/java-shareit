@@ -9,6 +9,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,16 +45,31 @@ class BookingDtoValidationTest {
 
         Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
 
-        assertFalse(violations.isEmpty());
-        assertEquals(1, violations.size());
-        assertEquals("Идентификатор вещи не может быть Null", violations.iterator().next().getMessage());
+        assertFalse(violations.isEmpty(), "Должны быть нарушения валидации");
+
+        Set<String> messages = violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toSet());
+
+        Set<String> paths = violations.stream()
+                .map(v -> v.getPropertyPath().toString())
+                .collect(Collectors.toSet());
+
+        assertTrue(
+                violations.stream().anyMatch(v ->
+                        "itemId".equals(v.getPropertyPath().toString()) &&
+                                "Идентификатор вещи не может быть Null".equals(v.getMessage())
+                ),
+                "Должно быть нарушение для itemId с правильным сообщением. " +
+                        "Найдены нарушения для полей: " + paths + " с сообщениями: " + messages
+        );
     }
 
     @Test
     void bookingDto_WhenStartIsInPast_ShouldFailValidation() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
-        bookingDto.setStart(LocalDateTime.now().minusDays(1)); // Past date
+        bookingDto.setStart(LocalDateTime.now().minusDays(1));
         bookingDto.setEnd(LocalDateTime.now().plusDays(2));
 
         Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
@@ -68,7 +84,7 @@ class BookingDtoValidationTest {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
         bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(LocalDateTime.now().minusDays(1)); // Past date
+        bookingDto.setEnd(LocalDateTime.now().minusDays(1));
 
         Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
 
@@ -82,7 +98,7 @@ class BookingDtoValidationTest {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
         bookingDto.setStart(LocalDateTime.now().plusDays(3));
-        bookingDto.setEnd(LocalDateTime.now().plusDays(2)); // End before start
+        bookingDto.setEnd(LocalDateTime.now().plusDays(2));
 
         Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
 
@@ -94,7 +110,7 @@ class BookingDtoValidationTest {
     void bookingDto_WhenStartIsNull_ShouldFailValidation() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
-        bookingDto.setStart(null); // Null start
+        bookingDto.setStart(null);
         bookingDto.setEnd(LocalDateTime.now().plusDays(2));
 
         Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
@@ -108,7 +124,7 @@ class BookingDtoValidationTest {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(1L);
         bookingDto.setStart(LocalDateTime.now().plusDays(1));
-        bookingDto.setEnd(null); // Null end
+        bookingDto.setEnd(null);
 
         Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
 

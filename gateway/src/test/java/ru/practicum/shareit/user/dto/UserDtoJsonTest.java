@@ -11,7 +11,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -95,15 +94,13 @@ class UserDtoJsonTest {
     @Test
     void userPatchDtoSerializationTest() throws Exception {
         UserPatchDto userPatchDto = new UserPatchDto();
-        userPatchDto.setId(Optional.of(1L));
-        userPatchDto.setName(Optional.of("Updated Name"));
-        userPatchDto.setEmail(Optional.of("updated@example.com"));
-        userPatchDto.setLogin(Optional.of("updatedlogin"));
-        userPatchDto.setBirthday(Optional.of(LocalDate.of(1990, 1, 1)));
+        userPatchDto.setName("Updated Name");
+        userPatchDto.setEmail("updated@example.com");
+        userPatchDto.setLogin("updatedlogin");
+        userPatchDto.setBirthday(LocalDate.of(1990, 1, 1));
 
         JsonContent<UserPatchDto> result = userPatchDtoJacksonTester.write(userPatchDto);
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("Updated Name");
         assertThat(result).extractingJsonPathStringValue("$.email").isEqualTo("updated@example.com");
         assertThat(result).extractingJsonPathStringValue("$.login").isEqualTo("updatedlogin");
@@ -117,8 +114,7 @@ class UserDtoJsonTest {
         UserPatchDto userPatchDto = objectMapper.readValue(json, UserPatchDto.class);
 
         assertThat(userPatchDto.getName()).isNotNull();
-        assertThat(userPatchDto.getName().isPresent()).isTrue();
-        assertThat(userPatchDto.getName().get()).isEqualTo("Only Name Updated");
+        assertThat(userPatchDto.getName()).isEqualTo("Only Name Updated");
 
         assertThat(userPatchDto.getEmail()).isNull();
         assertThat(userPatchDto.getLogin()).isNull();

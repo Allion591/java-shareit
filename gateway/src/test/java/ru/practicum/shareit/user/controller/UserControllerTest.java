@@ -11,9 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.client.UserClient;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserPatchDto;
-
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -93,8 +91,8 @@ class UserControllerTest {
     void updateUser_shouldReturnUpdatedUser() throws Exception {
         Long userId = 1L;
         UserPatchDto userPatchDto = new UserPatchDto();
-        userPatchDto.setName(Optional.of("Updated Name"));
-        userPatchDto.setEmail(Optional.of("updated@example.com"));
+        userPatchDto.setName("Updated Name");
+        userPatchDto.setEmail("updated@example.com");
 
         when(userClient.update(eq(userId), any(UserPatchDto.class)))
                 .thenReturn(ResponseEntity.ok().build());
